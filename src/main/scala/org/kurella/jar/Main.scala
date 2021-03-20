@@ -15,6 +15,6 @@ class SpecReader {
 
 object Main {
   def main(args: Array[String]): Unit = {
-    new SpecReader().readSpecMessage(args.head)
+    System.out.println(new SpecReader().readSpecMessage(args.head))
   }
 }
