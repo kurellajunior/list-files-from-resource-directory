@@ -11,6 +11,8 @@ class SpecReader (val spec:String) {
 
   private val basePath = s"/spec_$spec"
 
+  lazy val jarFileSystem: FileSystem = FileSystems.newFileSystem(getClass.getResource(basePath).toURI, Map[String, String]().asJava);
+
   def readSpecMessage(): String = {
     List("CN", "DO", "KF")
       .flatMap(ConfigFiles.listPathsFromResource(basePath, _).asScala.toSeq)
@@ -41,8 +43,6 @@ class SpecReader (val spec:String) {
     Array[Collector.Characteristics](): _*
 )
 
-  lazy val jarFileSystem: FileSystem = FileSystems.newFileSystem(getClass.getResource(basePath).toURI, Map[String, String]().asJava);
-
   def listPathsFromResource(folder: String): List[Path] = {
     Files.list(getPathForResource(folder))
       .filter(p ⇒ Files.isRegularFile(p, Array[LinkOption](): _*))
@@ -58,6 +58,6 @@ class SpecReader (val spec:String) {
 
 object Main {
   def main(args: Array[String]): Unit = {
-    System.out.println(new SpecReader(args.head).readSpecMessage())
+    System.out.println(new SpecReader(args.head).readSpecMessageScala())
   }
 }
