@@ -18,9 +18,9 @@ public class ConfigFiles {
   private static FileSystem jarFileSystem;
 
   //   lazy loading of jarFileSystem
-  static synchronized private FileSystem getJarFileAsFilesystem(String drg_file_root) throws URISyntaxException, IOException {
+  static synchronized private FileSystem getJarFileAsFilesystem(String specFolder) throws URISyntaxException, IOException {
     if (jarFileSystem == null) {
-      jarFileSystem = FileSystems.newFileSystem(ConfigFiles.class.getResource(drg_file_root).toURI(), Collections.emptyMap());
+      jarFileSystem = FileSystems.newFileSystem(ConfigFiles.class.getResource(specFolder).toURI(), Collections.emptyMap());
     }
     return jarFileSystem;
   }
