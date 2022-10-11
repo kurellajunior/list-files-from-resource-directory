@@ -11,8 +11,21 @@ class SpecReader (val spec:String) {
 
   private val basePath = s"/spec_$spec"
 
-  lazy val jarFileSystem: FileSystem = FileSystems.newFileSystem(getClass.getResource(basePath).toURI, Map[String, String]().asJava);
+  lazy val jarFileSystem: FileSystem = FileSystems.newFileSystem(getClass.getResource(basePath).toURI, Map[String, String]().asJava)
 
+  def listPathsFromResource(folder: String): List[Path] = {
+    Files.list(getPathForResource(folder))
+      .filter(p ⇒ Files.isRegularFile(p, Array[LinkOption](): _*))
+      .sorted.collect(collector)
+  }
+
+  private def getPathForResource(filename: String) = {
+    val url = classOf[ConfigFiles].getResource(basePath + "/" + filename)
+    if ("file" == url.getProtocol) Paths.get(url.toURI)
+    else jarFileSystem.getPath(basePath, filename)
+  }
+
+  // tooling methods for the showcase. all necessary code is above
   def readSpecMessage(): String = {
     List("CN", "DO", "KF")
       .flatMap(ConfigFiles.listPathsFromResource(basePath, _).asScala.toSeq)
@@ -27,9 +40,10 @@ class SpecReader (val spec:String) {
       .reduce(_ + " " + _)
   }
 
+  // was a nice exercise, keeping it for reference
   val collector: Collector[_ >: Path, ListBuffer[Path], List[Path]] =  Collector.of(
     new Supplier[ListBuffer[Path]]() {
-      override def get(): ListBuffer[Path] = ListBuffer[Path]()
+      override def get(): ListBuffer[Path] = ListBuffer.empty[Path]
     },
     new BiConsumer[ListBuffer[Path], Path]() {
       override def accept(t: ListBuffer[Path], u: Path): Unit = t.addOne(u)
@@ -43,17 +57,6 @@ class SpecReader (val spec:String) {
     Array[Collector.Characteristics](): _*
 )
 
-  def listPathsFromResource(folder: String): List[Path] = {
-    Files.list(getPathForResource(folder))
-      .filter(p ⇒ Files.isRegularFile(p, Array[LinkOption](): _*))
-      .sorted.collect(collector)
-  }
-
-  private def getPathForResource(filename: String) = {
-    val url = classOf[ConfigFiles].getResource(basePath + "/" + filename)
-    if ("file" == url.getProtocol) Paths.get(url.toURI)
-    else jarFileSystem.getPath(basePath, filename)
-  }
 }
 
 object Main {
