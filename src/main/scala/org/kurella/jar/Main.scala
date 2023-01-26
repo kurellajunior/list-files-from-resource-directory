@@ -16,7 +16,7 @@ class SpecReader (val spec:String) {
   def listPathsFromResource(folder: String): List[Path] = {
     Files.list(getPathForResource(folder))
       .filter(p ⇒ Files.isRegularFile(p, Array[LinkOption](): _*))
-      .sorted.collect(collector)
+      .sorted.toList.asScala.toList // from Stream to java List to Scala Buffer to scala List
   }
 
   private def getPathForResource(filename: String) = {
